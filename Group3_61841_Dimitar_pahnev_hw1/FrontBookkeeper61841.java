@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class FrontBookkeeper61841 implements IFrontBookkeeper {
 
+	public static final String AFTER = "after";
 	public static final String SOLDIER = "soldier";
 	public static final String SHOW = "show";
 	public static final String SOLDIERS = "soldiers";
@@ -32,6 +33,10 @@ public class FrontBookkeeper61841 implements IFrontBookkeeper {
 		unit2.attach(unit1);
 	}
 
+	public void unitAttachment(Unit unit1, Unit unit2, Soldier soldier) {
+		unit2.attach(unit1, soldier);
+	}
+
 	@Override
 	public String updateFront(String[] news) {
 		StringBuilder output = new StringBuilder();
@@ -56,10 +61,20 @@ public class FrontBookkeeper61841 implements IFrontBookkeeper {
 					}
 				}
 			}
-			if (function[1].equals(ATTACHED)) {
+
+			if (function[1].equals(ATTACHED) && !(function[function.length - 3].contains(AFTER))) {
 				Unit unit1 = this.units.get(function[0]);
 				Unit unit2 = this.units.get(function[3]);
 				unitAttachment(unit1, unit2);
+			}
+
+			if (function[1].equals(ATTACHED) && function[function.length - 3].equals(AFTER)) {
+
+				Unit unit1 = this.units.get(function[0]);
+				Unit unit2 = this.units.get(function[3]);
+				Soldier soldier = this.boici.get(function[function.length - 1]);
+				unitAttachment(unit1, unit2, soldier);
+
 			}
 
 			if (function[0].equals(SOLDIERS)) {

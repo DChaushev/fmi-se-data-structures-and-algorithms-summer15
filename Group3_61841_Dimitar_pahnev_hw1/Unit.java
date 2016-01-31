@@ -24,18 +24,35 @@ public class Unit {
 		atachedUnits = new LinkedList<>();
 	}
 
+	public void attach(Unit unit, Soldier soldierAfterWhomToAdd) {
+		if (unit.atachedTo != null) {
+			unatach(unit);
+		}
+		this.atachedUnits.add(unit);
+		int indexOfSoldier = this.soldiers.indexOf(soldierAfterWhomToAdd) + 1;
+		this.soldiers.addAll(indexOfSoldier, unit.soldiers);
+		for (Soldier soldier : unit.soldiers) {
+			soldier.units.add(this);
+		}
+		if (this.atachedTo != null) {
+			this.atachedTo.addSoldiers(unit.soldiers, soldierAfterWhomToAdd);
+		}
+		unit.atachedTo = this;
+
+	}
+
 	public void attach(Unit unit) {
 		if (unit.atachedTo != null) {
 			unatach(unit);
 		}
 		this.atachedUnits.add(unit);
-		soldiers.addAll(unit.soldiers);
-		for (Soldier soldier : soldiers) {
-			soldier.units.add(unit);
+		this.soldiers.addAll(unit.soldiers);
+		for (Soldier soldier : unit.soldiers) {
+			soldier.units.add(this);
 
 		}
 		if (this.atachedTo != null) {
-			atachedTo.addSoldiers(this.soldiers);
+			atachedTo.addSoldiers(unit.soldiers);
 		}
 		unit.atachedTo = this;
 	}
@@ -43,11 +60,21 @@ public class Unit {
 	private void unatach(Unit unit) {
 		unit.atachedTo.atachedUnits.remove(unit);
 		unit.atachedTo.soldiers.removeAll(unit.soldiers);
+		for (Soldier soldier : unit.soldiers) {
+			soldier.units.remove(unit.atachedTo);
+		}
 		if (unit.atachedTo.atachedTo != null) {
-			System.out.println("kur za levski");
 			unit.atachedTo.removeSoldier(unit.soldiers);
 		}
 
+	}
+
+	private void addSoldiers(LinkedList<Soldier> soldiers, Soldier soldierToWhomIndexToAdd) {
+		int StartIndex = this.soldiers.indexOf(soldierToWhomIndexToAdd) + 1;
+		this.soldiers.addAll(StartIndex, soldiers);
+		if (this.atachedTo != null) {
+			atachedTo.addSoldiers(soldiers, soldierToWhomIndexToAdd);
+		}
 	}
 
 	private void addSoldiers(LinkedList<Soldier> soldiers) {
@@ -59,6 +86,9 @@ public class Unit {
 
 	private void removeSoldier(LinkedList<Soldier> soldiers) {
 		this.soldiers.removeAll(soldiers);
+		for (Soldier soldier : soldiers) {
+			soldier.units.remove(this.atachedTo);
+		}
 		if (this.atachedTo != null) {
 			atachedTo.removeSoldier(soldiers);
 		}
@@ -119,5 +149,4 @@ public class Unit {
 			}
 		}
 	}
-
 }
